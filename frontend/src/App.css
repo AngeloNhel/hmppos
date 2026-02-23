@@ -1,0 +1,115 @@
+body {
+  margin: 0;
+  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+  background: #f0f2f5;
+  color: #333;
+}
+
+.navbar {
+  background: linear-gradient(90deg, #1e3c72, #2a5298);
+  color: white;
+  padding: 15px 40px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  box-shadow: 0 2px 6px rgba(0,0,0,0.2);
+}
+
+.navbar button {
+  background: #ff4d4f;
+  padding: 8px 15px;
+  border-radius: 5px;
+  border: none;
+  color: white;
+  cursor: pointer;
+  font-weight: bold;
+}
+
+.dashboard {
+  padding: 60px 20px;
+  max-width: 900px;
+  margin: auto;
+  text-align: center;
+  background: white;
+  border-radius: 15px;
+  box-shadow: 0 4px 20px rgba(0,0,0,0.1);
+}
+
+.dashboard h1 {
+  font-size: 36px;
+  margin-bottom: 15px;
+  color: #1e3c72;
+}
+
+.dashboard p {
+  font-size: 18px;
+  color: #555;
+}
+
+.container {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  height: 100vh;
+}
+
+.card {
+  background: white;
+  padding: 40px 30px;
+  border-radius: 15px;
+  width: 100%;
+  max-width: 400px;
+  box-shadow: 0 4px 20px rgba(0,0,0,0.1);
+  text-align: center;
+}
+
+.card h2 {
+  margin-bottom: 20px;
+  color: #1e3c72;
+}
+
+.card input, .card select {
+  width: 100%;
+  padding: 12px 15px;
+  margin-bottom: 15px;
+  border-radius: 8px;
+  border: 1px solid #ccc;
+  font-size: 16px;
+}
+
+.card button {
+  width: 100%;
+  padding: 12px;
+  border: none;
+  border-radius: 8px;
+  background: linear-gradient(90deg, #1e3c72, #2a5298);
+  color: white;
+  font-size: 18px;
+  font-weight: bold;
+  cursor: pointer;
+  transition: 0.3s;
+}
+
+.card button:hover {
+  background: linear-gradient(90deg, #2a5298, #1e3c72);
+}
+
+.message {
+  margin-bottom: 15px;
+  color: #ff4d4f;
+  font-weight: bold;
+}
+
+.link-text {
+  margin-top: 10px;
+}
+
+.link-text a {
+  color: #1e3c72;
+  font-weight: bold;
+  text-decoration: none;
+}
+
+.link-text a:hover {
+  text-decoration: underline;
+}
