@@ -1,10 +1,9 @@
 import React, { useState } from "react";
-import { Link, useNavigate } from "react-router-dom";
+import { useNavigate } from "react-router-dom";
 import axios from "axios";
 
 function Login() {
   const [form, setForm] = useState({ username: "", password: "" });
-  const [loading, setLoading] = useState(false);
   const [message, setMessage] = useState("");
   const navigate = useNavigate();
 
@@ -14,11 +13,14 @@ function Login() {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    setLoading(true);
     setMessage("");
 
     try {
-      const res = await axios.post("http://localhost:5000/api/auth/login", form);
+      const res = await axios.post(
+        "http://localhost:5000/api/auth/login",
+        form
+      );
+
       localStorage.setItem("token", res.data.token);
 
       const decoded = JSON.parse(atob(res.data.token.split(".")[1]));
@@ -26,11 +28,10 @@ function Login() {
 
       if (role === "admin") navigate("/admin");
       else navigate("/pos");
+
     } catch (err) {
       setMessage(err.response?.data?.message || "Login failed");
     }
-
-    setLoading(false);
   };
 
   return (
@@ -57,14 +58,10 @@ function Login() {
             required
           />
 
-          <button type="submit" disabled={loading}>
-            {loading ? "Logging in..." : "Login"}
+          <button type="submit">
+            Login
           </button>
         </form>
-
-        <p className="link-text">
-          Don't have an account? <Link to="/register">Register here</Link>
-        </p>
       </div>
     </div>
   );

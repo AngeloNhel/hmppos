@@ -1,9 +1,14 @@
 import React, { useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
-import axios from "axios";
+import API from "../services/api"; // use central API
 
 function Register() {
-  const [form, setForm] = useState({ username: "", password: "", role: "cashier" });
+  const [form, setForm] = useState({
+    username: "",
+    password: "",
+    role: "cashier", // force cashier
+  });
+
   const [loading, setLoading] = useState(false);
   const [message, setMessage] = useState("");
   const navigate = useNavigate();
@@ -18,7 +23,7 @@ function Register() {
     setMessage("");
 
     try {
-      const res = await axios.post("http://localhost:5000/api/auth/register", form);
+      const res = await API.post("/auth/register", form);
       setMessage(res.data.message);
       setTimeout(() => navigate("/"), 1500);
     } catch (err) {
@@ -31,7 +36,7 @@ function Register() {
   return (
     <div className="container">
       <div className="card">
-        <h2>Create Account</h2>
+        <h2>Create Cashier Account</h2>
 
         {message && <p className="message">{message}</p>}
 
@@ -51,11 +56,6 @@ function Register() {
             onChange={handleChange}
             required
           />
-
-          <select name="role" onChange={handleChange} value={form.role}>
-            <option value="cashier">Cashier</option>
-            <option value="admin">Admin</option>
-          </select>
 
           <button type="submit" disabled={loading}>
             {loading ? "Creating..." : "Register"}

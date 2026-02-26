@@ -4,7 +4,7 @@ import { useNavigate } from "react-router-dom";
 function Navbar() {
   const navigate = useNavigate();
 
-  const handleLogout = () => {
+  const logout = () => {
     localStorage.removeItem("token");
     navigate("/");
   };
@@ -12,7 +12,7 @@ function Navbar() {
   return (
     <div className="navbar">
       <h2>HMP POS System</h2>
-      <button onClick={handleLogout}>Logout</button>
+      <button onClick={logout}>Logout</button>
     </div>
   );
 }
