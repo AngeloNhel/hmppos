@@ -1,7 +1,6 @@
 import React from "react";
 import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
 import Login from "./pages/Login";
-import Register from "./pages/Register";
 import AdminDashboard from "./pages/AdminDashboard";
 import POSDashboard from "./pages/POSDashboard";
 import ProtectedRoute from "./components/ProtectedRoute";

@@ -124,3 +124,62 @@ exports.getSummary = async (req, res) => {
     res.status(500).json({ message: "Summary error" });
   }
 };
+
+// GET SALES REPORT PER USER
+exports.getSalesByUser = async (req, res) => {
+  const { userId } = req.params;
+  const { start, end } = req.query;
+
+  let sql = `
+    SELECT 
+      s.id AS sale_id,
+      s.total_amount,
+      s.created_at,
+      p.name AS product_name,
+      si.quantity,
+      si.unit,
+      si.subtotal
+    FROM sales s
+    JOIN sale_items si ON s.id = si.sale_id
+    JOIN products p ON si.product_id = p.id
+    WHERE s.user_id = ?
+  `;
+
+  const values = [userId];
+
+  if (start && end) {
+    sql += " AND DATE(s.created_at) BETWEEN ? AND ?";
+    values.push(start, end);
+  }
+
+  sql += " ORDER BY s.created_at DESC";
+
+  try {
+    const [rows] = await db.query(sql, values);
+
+    // SUMMARY
+    const [today] = await db.query(`
+      SELECT IFNULL(SUM(total_amount),0) total
+      FROM sales
+      WHERE user_id = ?
+      AND DATE(created_at) = CURDATE()
+    `, [userId]);
+
+    const [week] = await db.query(`
+      SELECT IFNULL(SUM(total_amount),0) total
+      FROM sales
+      WHERE user_id = ?
+      AND YEARWEEK(created_at,1) = YEARWEEK(CURDATE(),1)
+    `, [userId]);
+
+    res.json({
+      sales: rows,
+      today: today[0].total,
+      week: week[0].total,
+    });
+
+  } catch (err) {
+    console.log(err);
+    res.status(500).json({ message: "User sales report error" });
+  }
+};
