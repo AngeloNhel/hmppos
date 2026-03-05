@@ -1,11 +1,7 @@
 import axios from "axios";
 
 const API = axios.create({
-  baseURL:
-    process.env.REACT_APP_API_URL ||
-    (process.env.NODE_ENV === "development"
-      ? "http://localhost:5000/api"
-      : ""),
+  baseURL: process.env.REACT_APP_API_URL || "https://hmppos.onrender.com/api",
 });
 
 API.interceptors.request.use((req) => {
