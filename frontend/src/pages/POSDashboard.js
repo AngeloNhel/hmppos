@@ -1,4 +1,4 @@
-import React, { useEffect, useState, useRef  } from "react";
+import React, { useEffect, useState, useRef, useCallback } from "react";
 import Navbar from "../components/Navbar";
 import API from "../services/api";
 import { Line } from "react-chartjs-2";
@@ -252,26 +252,43 @@ const printReport = () => {
   const [payment, setPayment] = useState("");
   const [currentTime, setCurrentTime] = useState(new Date());
 
-  useEffect(() => {
-    if (!token) return;
-
-    const base64Payload = token.split(".")[1];
-    const payload = JSON.parse(atob(base64Payload));
-    setCashierName(payload.username);
-
-    fetchSummary();
-    fetchReport();
-    fetchProducts();
-
-    const timer = setInterval(() => {
-      setCurrentTime(new Date());
-    }, 1000);
-
-    return () => clearInterval(timer);
-  }, []);
-
- const [startDate, setStartDate] = useState("");
+   const [startDate, setStartDate] = useState("");
 const [endDate, setEndDate] = useState("");
+  
+ const fetchReport = useCallback(async () => {
+  try {
+    let url = "/sales/report";
+
+    if (startDate && endDate) {
+      url += `?start=${startDate}&end=${endDate}`;
+    }
+
+    const res = await API.get(url);
+    setReport(res.data);
+  } catch (err) {
+    console.log(err);
+  }
+}, [startDate, endDate]);
+
+  useEffect(() => {
+  if (!token) return;
+
+  const base64Payload = token.split(".")[1];
+  const payload = JSON.parse(atob(base64Payload));
+  setCashierName(payload.username);
+
+  fetchSummary();
+  fetchProducts();
+  fetchReport();
+
+  const timer = setInterval(() => {
+    setCurrentTime(new Date());
+  }, 1000);
+
+  return () => clearInterval(timer);
+}, [fetchReport, token]);
+
+
 
 
   const fetchProducts = async () => {
@@ -288,20 +305,6 @@ const [endDate, setEndDate] = useState("");
     });
   };
 
- const fetchReport = async () => {
-  try {
-    let url = "/sales/report";
-
-    if (startDate && endDate) {
-      url += `?start=${startDate}&end=${endDate}`;
-    }
-
-    const res = await API.get(url);
-    setReport(res.data);
-  } catch (err) {
-    console.log(err);
-  }
-};
 
 
  const addToCart = (product) => {
@@ -347,7 +350,6 @@ const [endDate, setEndDate] = useState("");
   (acc, item) => acc + Number(item.subtotal),
   0
 );
-  const change = payment ? payment - subtotal : 0;
 
   const handleCheckout = async () => {
       if (cart.length === 0) return alert("Cart is empty");
