@@ -6,7 +6,7 @@ const app = express();
 
 // allow requests from your Netlify frontend
 app.use(cors({
-  origin: "https://brilliant-concha-645eab.netlify.app",
+  origin: "https://hmppos.onrender.com",
 }));
 
 app.use(express.json());
