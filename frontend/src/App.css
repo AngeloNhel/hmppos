@@ -384,3 +384,83 @@ font-weight:600;
 color:#1e3c72;
 margin-bottom:10px;
 }
+
+/* FUNCTIONS PANEL */
+
+.functions-card{
+background:rgba(255,255,255,0.20);
+padding:15px;
+border-radius:12px;
+color:white;
+width:350px;
+}
+
+.functions-card h3{
+margin-bottom:10px;
+}
+
+
+/* GRID */
+
+.functions-grid{
+display:grid;
+grid-template-columns:repeat(3,1fr);
+gap:20px;
+}
+
+/* BUTTON */
+
+.func-btn{
+position:relative;
+border:none;
+border-radius:10px;
+padding:15px;
+display:flex;
+flex-direction:column;
+align-items:center;
+justify-content:center;
+gap:5px;
+cursor:pointer;
+color:white;
+font-weight:600;
+transition:0.2s;
+}
+
+.func-icon{
+font-size:40px;
+color:white;
+}
+
+.func-btn p{
+font-size:14px;
+margin:0;
+}
+
+/* KEY LABEL */
+
+.func-btn .key{
+position:absolute;
+top:5px;
+right:8px;
+font-size:10px;
+background:rgba(255,255,255,0.2);
+padding:2px 5px;
+border-radius:4px;
+}
+
+/* COLORS */
+
+.search{background:#16a34a;}
+.qty{background:#0ea5e9;}
+.amount{background:#6366f1;}
+.delete{background:#dc2626;}
+.hold{background:#f59e0b;}
+.recall{background:#3b82f6;}
+.print{background:#22c55e;}
+.new{background:#06b6d4;}
+.exit{background:#ef4444;}
+
+.func-btn:hover{
+transform:scale(1.05);
+box-shadow:0 4px 10px rgba(0,0,0,0.3);
+}

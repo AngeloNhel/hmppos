@@ -1,5 +1,16 @@
 import Navbar from "../components/Navbar";
 import React, { useState, useEffect } from "react";
+import { 
+FaSearch, 
+FaShoppingCart, 
+FaMoneyBill, 
+FaTimes, 
+FaPause, 
+FaFileAlt, 
+FaPrint, 
+FaPlus, 
+FaPowerOff 
+} from "react-icons/fa";
 
 function AdminDashboard() {
 
@@ -7,6 +18,9 @@ function AdminDashboard() {
   const [orNumber, setOrNumber] = useState("");
   const [description, setDescription] = useState("");
   const [customer, setCustomer] = useState("");
+
+
+
 
   useEffect(() => {
     const randomOR = "OR-" + Math.floor(100000 + Math.random() * 900000);
@@ -166,6 +180,64 @@ function AdminDashboard() {
 
           <div className="functions-card">
             <h3>Functions</h3>
+
+            <div className="functions-grid">
+
+             <button className="func-btn search">
+                <span className="key">F1</span>
+                <FaSearch className="func-icon"/>
+                <p>Search Item</p>
+              </button>
+
+              <button className="func-btn qty">
+                <span className="key">F2</span>
+                <FaShoppingCart className="func-icon"/>
+                <p>Change QTY</p>
+              </button>
+
+              <button className="func-btn amount">
+                <span className="key">F3</span>
+                <FaMoneyBill className="func-icon"/>
+                <p>Change Amt</p>
+              </button>
+
+              <button className="func-btn delete">
+                <span className="key">F4</span>
+                <FaTimes className="func-icon"/>
+                <p>Delete Item</p>
+              </button>
+
+              <button className="func-btn hold">
+                <span className="key">F5</span>
+                <FaPause className="func-icon"/>
+                <p>Hold Trans</p>
+              </button>
+
+              <button className="func-btn recall">
+                <span className="key">F6</span>
+                <FaFileAlt className="func-icon"/>
+                <p>Recall Trans</p>
+              </button>
+
+              <button className="func-btn print">
+                <span className="key">F7</span>
+                <FaPrint className="func-icon"/>
+                <p>Reprint OR</p>
+              </button>
+
+              <button className="func-btn new">
+                <span className="key">F8</span>
+                <FaPlus className="func-icon"/>
+                <p>New Trans</p>
+              </button>
+
+              <button className="func-btn exit">
+                <span className="key">Esc</span>
+                <FaPowerOff className="func-icon"/>
+                <p>Exit</p>
+              </button>
+
+            </div>
           </div>
 
           <div className="logo-card">
