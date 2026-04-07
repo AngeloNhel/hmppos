@@ -13,23 +13,56 @@ FaPowerOff
 } from "react-icons/fa";
 import API from "../services/api";
 import ProductModal from "../components/modals/ProductModal";
+import CheckoutModal from "../components/modals/CheckoutModal";
 
 function AdminDashboard() {
 
   const [view, setView] = useState("items");
   const [orNumber, setOrNumber] = useState("");
   const [description, setDescription] = useState("");
-  const [customer, setCustomer] = useState("");
   const [products, setProducts] = useState([]);
   const [barcode, setBarcode] = useState("");
   const [selectedProduct, setSelectedProduct] = useState(null);
   const [showModal, setShowModal] = useState(false);
   const [cart, setCart] = useState([]);
   const [highlightId, setHighlightId] = useState(null);
+  const [discount, setDiscount] = useState(0);
+  const [tendered, setTendered] = useState(0);
+  const [showCheckoutModal, setShowCheckoutModal] = useState(false);
+  const [customers, setCustomers] = useState([]);
+  const [customer, setCustomer] = useState("");
+  const [showCustomerDropdown, setShowCustomerDropdown] = useState(false);
 
 
+  // FETCH CUSTOMERS NAMES FROM SALES FOR DROPDOWN
+const fetchCustomers = async () => {
+  try {
+    const token = localStorage.getItem("token");
+
+    const res = await API.get("/sales/customers", {
+      headers: {
+        Authorization: `Bearer ${token}`,
+      },
+    });
+
+    setCustomers(res.data);
+  } catch (err) {
+    console.error("FETCH CUSTOMERS ERROR:", err);
+  }
+};
+
+useEffect(() => {
+  fetchCustomers();
+}, []);
   
-
+const handleConfirmCheckout = () => {
+  setCart([]);
+  setTendered("");
+  setDiscount(0);
+  setCustomer("");
+  setBarcode("");
+  setView("items"); // go back to items
+};
 // HANDLES KEYBOARD SHORTCUTS
 useEffect(() => {
   const handleKeyPress = (e) => {
@@ -68,11 +101,22 @@ useEffect(() => {
     setShowModal(true);
   };
 
-//  COMPUTE SUBTOTAL
+  //  COMPUTE SUBTOTAL
   const subtotal = cart.reduce(
     (sum, item) => sum + item.price * item.qty,
     0
   );
+  // TOTAL AFTER DISCOUNT
+  const discountAmount = subtotal * (discount / 100);
+  const totalAmount = subtotal - discountAmount;
+  // CHANGE
+  const change = Math.max(tendered - totalAmount, 0);
+  const handleNumberInput = (value, setter) => {
+    // remove leading zeros
+  const cleaned = value.replace(/^0+(?=\d)/, "");
+
+    setter(cleaned === "" ? "" : Number(cleaned));
+  };
 
   // CART FUNCTION
     const handleAddToCart = (product, qty = 1) => {
@@ -171,7 +215,6 @@ useEffect(() => {
     setOrNumber(randomOR);
   }, []);
 
-  const customers = ["Walk-in", "Juan Dela Cruz", "Maria Santos", "Pedro Reyes"];
 
   const title = view === "items" ? "Displayed Items" : "Customers Cart";
 
@@ -204,18 +247,46 @@ useEffect(() => {
                 />
               </div>
 
-              <div className="pos-field">
-                <label>Customer</label>
-                <select
-                  value={customer}
-                  onChange={(e) => setCustomer(e.target.value)}
-                >
-                  <option value="">Select Customer</option>
-                  {customers.map((c, index) => (
-                    <option key={index} value={c}>{c}</option>
-                  ))}
-                </select>
-              </div>
+             <div className="pos-field">
+  <label>Customer</label>
+
+  <div className="custom-dropdown">
+    <input
+      type="text"
+      value={customer}
+      onChange={(e) => setCustomer(e.target.value)}
+      onFocus={() => setShowCustomerDropdown(true)}
+      placeholder="Walk-in or type name"
+    />
+
+    {showCustomerDropdown && (
+      <ul className="dropdown-list">
+        <li onClick={() => {
+          setCustomer("");
+          setShowCustomerDropdown(false);
+        }}>
+          Walk-in
+        </li>
+
+        {customers
+          .filter(c =>
+            c.customer_name.toLowerCase().includes(customer.toLowerCase())
+          )
+          .map((c, index) => (
+            <li
+              key={index}
+              onClick={() => {
+                setCustomer(c.customer_name);
+                setShowCustomerDropdown(false);
+              }}
+            >
+              {c.customer_name}
+            </li>
+          ))}
+      </ul>
+    )}
+  </div>
+</div>
 
             </div>
 
@@ -233,6 +304,7 @@ useEffect(() => {
           </div>
 
           {view === "items" && (
+          <div className="table-scroll">
             <table className="modern-table">
               <thead>
                 <tr>
@@ -244,12 +316,11 @@ useEffect(() => {
                 </tr>
               </thead>
 
-              <tbody>
+              <tbody className="table-body-scroll">
                 {filteredProducts.map((product) => (
                   <tr
                     key={product.id}
                     onDoubleClick={() => handleRowDoubleClick(product)}
-                    style={{ cursor: "pointer" }}
                   >
                     <td>{product.description}</td>
                     <td>{product.unit || "pcs"}</td>
@@ -260,7 +331,8 @@ useEffect(() => {
                 ))}
               </tbody>
             </table>
-          )}
+          </div>
+        )}
 
           {view === "cart" && (
             <table className="modern-table">
@@ -274,7 +346,7 @@ useEffect(() => {
                 </tr>
               </thead>
 
-              <tbody>
+              <tbody className="table-body-scroll">
                 {cart.map((item) => (
                   <tr
                     key={item.id}
@@ -313,23 +385,59 @@ useEffect(() => {
                 <input type="text" value={`₱${subtotal}`} readOnly />  
               </div>  
               <div className="pos-field">
-                <label>Discount: </label>
-                <input type="text" placeholder="₱0.00" />
+                <label>Discount (%): </label>
+                <input
+                  type="number"
+                  value={discount}
+                  onChange={(e) => handleNumberInput(e.target.value, setDiscount)}
+                  placeholder="0"
+                />
               </div>
+              <div className="pos-field">
+                <label>Discount Amount: </label>
+                <input
+                  type="text"
+                  value={`₱${discountAmount.toFixed(2)}`}
+                  readOnly
+                />
+              </div>
+
               <div className="pos-field">
                 <label>Total Amount: </label>
-                <input type="text" placeholder="₱0.00" />
+                <input
+                  type="text"
+                  value={`₱${totalAmount.toFixed(2)}`}
+                  readOnly
+                />
               </div>
+
               <div className="pos-field">
                 <label>Tendered Amount: </label>
-                <input type="text" placeholder="₱0.00" />
+                <input
+                  type="number"
+                  value={tendered}
+                  onChange={(e) => handleNumberInput(e.target.value, setTendered)}
+                  onKeyDown={(e) => {
+                    if (e.key === "Enter") {
+                      if (cart.length === 0) {
+                        alert("Cart is empty!");
+                        return;
+                      }
+
+                      setShowCheckoutModal(true);
+                    }
+                  }}
+                  placeholder="0"
+                />
               </div>
+
               <div className="pos-field">
                 <label>Change: </label>
-                <input type="text" placeholder="₱0.00" />
-              </div>
-              <div className="pos-buttons"> 
-                <button>Print</button>
+                <input
+                  type="text"
+                  value={`₱${change >= 0 ? change.toFixed(2) : "0.00"}`}
+                  readOnly
+                />
               </div>
           </div>
 
@@ -411,6 +519,20 @@ useEffect(() => {
       product={selectedProduct}
       onClose={() => setShowModal(false)}
       onAdd={handleAddToCart}
+    />
+        <CheckoutModal
+      show={showCheckoutModal}
+      onClose={() => setShowCheckoutModal(false)}
+      onConfirm={handleConfirmCheckout}
+      cart={cart}
+      subtotal={subtotal}
+      discount={discount}
+      discountAmount={discountAmount}
+      totalAmount={totalAmount}
+      tendered={tendered}
+      change={change}
+      customer={customer}
+      onRefresh={fetchProducts}
     />
     </>
     

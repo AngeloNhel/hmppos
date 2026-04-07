@@ -600,3 +600,183 @@ box-shadow:0 4px 10px rgba(0,0,0,0.3);
     transform: scale(1);
   }
 }
+
+
+/* Checkout modal */
+
+/* RECEIPT MODAL */
+.receipt-modal {
+  width: 400px;
+  max-height: 90vh;
+  overflow-y: auto;
+
+  background: #fff;
+  border-radius: 12px;
+  padding: 20px;
+
+  box-shadow: 0 10px 30px rgba(0,0,0,0.3);
+  font-family: monospace;
+}
+
+/* HEADER */
+.receipt-header {
+  text-align: center;
+  border-bottom: 1px dashed #ccc;
+  padding-bottom: 10px;
+  margin-bottom: 10px;
+}
+
+.receipt-header h2 {
+  margin: 0;
+}
+
+/* TABLE */
+.receipt-table {
+  width: 100%;
+  font-size: 13px;
+  border-collapse: collapse;
+}
+
+.receipt-table th,
+.receipt-table td {
+  padding: 6px;
+  text-align: left;
+}
+
+.receipt-table thead {
+  border-bottom: 1px dashed #ccc;
+}
+
+/* SUMMARY */
+.receipt-summary {
+  margin-top: 10px;
+  font-size: 14px;
+}
+
+.receipt-summary div {
+  display: flex;
+  justify-content: space-between;
+  margin: 3px 0;
+}
+
+.total-line {
+  border-top: 1px dashed #000;
+  margin-top: 8px;
+  padding-top: 5px;
+  font-weight: bold;
+  font-size: 16px;
+}
+
+/* BUTTONS */
+.receipt-actions {
+  display: flex;
+  justify-content: space-between;
+  margin-top: 15px;
+}
+
+.print-btn {
+  background: #28a745;
+  color: white;
+  padding: 8px 15px;
+  border: none;
+  border-radius: 6px;
+  cursor: pointer;
+}
+
+.close-btn {
+  background: #dc3545;
+  color: white;
+  padding: 8px 15px;
+  border: none;
+  border-radius: 6px;
+  cursor: pointer;
+}
+
+/* PRINT MODE */
+@media print {
+  body * {
+    visibility: hidden;
+  }
+
+  .receipt-modal,
+  .receipt-modal * {
+    visibility: visible;
+  }
+
+  .receipt-modal {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+  }
+
+  .receipt-actions {
+    display: none;
+  }
+}
+
+
+.modern-table tbody tr {
+  height: 50px; /* FIXED row height */
+}
+.table-body-scroll {
+  display: block;
+  height: calc(5 * 50px); /* EXACTLY 5 ROWS */
+  overflow-y: auto;
+}
+.modern-table thead,
+.modern-table tbody tr {
+  display: table;
+  width: 100%;
+  table-layout: fixed;
+}
+
+
+/* WRAPPER */
+.custom-dropdown {
+  position: relative;
+  width: 200px; /* 👈 CONTROL SIZE HERE */
+}
+
+/* INPUT */
+.custom-dropdown input {
+  width: 100%;
+  height: 30px;
+  padding: 0 8px;
+  border: 1px solid #ccc;
+  border-radius: 6px;
+}
+
+/* DROPDOWN LIST */
+.dropdown-list {
+  position: absolute;
+  top: 35px;
+  left: 0;
+  width: 100%;
+
+  background: white;
+  border: 1px solid #ccc;
+  border-radius: 6px;
+
+  max-height: 120px; /* 👈 SMALL SIZE */
+  overflow-y: auto;
+
+  list-style: none;
+  padding: 0;
+  margin: 0;
+
+  z-index: 999;
+}
+
+/* ITEMS */
+.dropdown-list li {
+  padding: 6px 10px;
+  cursor: pointer;
+  font-size: 13px;
+}
+
+/* HOVER */
+.dropdown-list li:hover {
+  background: #007bff;
+  color: white;
+}

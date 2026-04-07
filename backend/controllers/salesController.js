@@ -263,3 +263,121 @@ exports.getSalesByUser = async (req, res) => {
     res.status(500).json({ message: "User sales report error" });
   }
 };
+
+
+
+
+// NEWWWWWWWWWWWWWWWWWWWWW POSSSSSSSSSSSSSSSSS
+// customers name in the dropdown 
+exports.getCustomers = async (req, res) => {
+  try {
+    const [rows] = await db.query(`
+      SELECT DISTINCT customer_name 
+      FROM sales 
+      WHERE customer_name IS NOT NULL 
+      AND customer_name != ''
+      ORDER BY customer_name ASC
+    `);
+
+    res.json(rows);
+  } catch (err) {
+    console.log("GET CUSTOMERS ERROR:", err);
+    res.status(500).json({ message: err.message });
+  }
+};
+// checkout modal reciept
+exports.createSale = async (req, res) => {
+  const {
+    cart,
+    subtotal,
+    discount_percent,
+    discount_amount,
+    total_amount,
+    tendered,
+    change_amount,
+    customer_name,
+    user_id
+  } = req.body;
+
+  const connection = await db.getConnection();
+
+  try {
+    await connection.beginTransaction();
+
+    // 1. INSERT SALE
+    const [saleResult] = await connection.query(
+      `INSERT INTO sales 
+      (receipt_no, user_id, subtotal, total_amount, created_at, discount_percent, discount_amount, tendered, change_amount, customer_name, status)
+      VALUES (?, ?, ?, ?, NOW(), ?, ?, ?, ?, ?, 'completed')`,
+      [
+        `OR-${Date.now()}`, // auto receipt
+        user_id,
+        subtotal,
+        total_amount,
+        discount_percent,
+        discount_amount,
+        tendered,
+        change_amount,
+        customer_name || "Walk-in"
+      ]
+    );
+
+    const saleId = saleResult.insertId;
+
+    // 2. INSERT SALE ITEMS + UPDATE STOCK
+    for (const item of cart) {
+      // insert sale item
+      await connection.query(
+        `INSERT INTO sale_items 
+        (sale_id, product_id, quantity, unit, subtotal, product_name, price)
+        VALUES (?, ?, ?, ?, ?, ?, ?)`,
+        [
+          saleId,
+          item.id,
+          item.qty,
+          "pcs",
+          item.price * item.qty,
+          item.name,
+          item.price
+        ]
+      );
+
+      // update product stock
+      await connection.query(
+        `UPDATE products 
+         SET stock = stock - ? 
+         WHERE id = ?`,
+        [item.qty, item.id]
+      );
+
+      // insert stock history
+      await connection.query(
+        `INSERT INTO stock_history 
+        (product_id, stock_change, movement_type, created_at)
+        VALUES (?, ?, 'SALE', NOW())`,
+        [item.id, -item.qty]
+      );
+    }
+
+    // 3. AUDIT LOG
+    await connection.query(
+      `INSERT INTO audit_logs (action, description, user_id, created_at)
+       VALUES ('SALE', ?, ?, NOW())`,
+      [`Processed sale OR-${saleId}`, user_id]
+    );
+
+    await connection.commit();
+
+    res.status(200).json({
+      message: "Sale completed successfully",
+      sale_id: saleId
+    });
+
+  } catch (error) {
+    await connection.rollback();
+    console.error("CHECKOUT ERROR:", error);
+    res.status(500).json({ message: "Checkout failed" });
+  } finally {
+    connection.release();
+  }
+};
